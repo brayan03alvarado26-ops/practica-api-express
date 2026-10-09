@@ -1,60 +1,113 @@
+require('dotenv').config();
 const express = require('express');
+const pool = require('./config/db');
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-let libros = [
-  { id: 1, nombre: 'Cien años de soledad', autor: 'Gabriel García Márquez' },
-  { id: 2, nombre: 'El principito', autor: 'Antoine de Saint-Exupéry' },
-  { id: 3, nombre: 'Don Quijote de la Mancha', autor: 'Miguel de Cervantes' }
-];
+// Verificar conexión a PostgreSQL al iniciar
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('Error al conectar a PostgreSQL:', err.message);
+    process.exit(1);
+  }
+  release();
+  console.log('Conectado exitosamente a la base de datos PostgreSQL');
+});
 
 // Ruta base
 app.get('/', (req, res) => {
   res.send('Servidor en línea');
 });
 
-// GET todos
-app.get('/api/libros', (req, res) => {
-  res.status(200).json(libros);
-});
-
-// GET por id
-app.get('/api/libros/:id', (req, res) => {
-  const libro = libros.find(l => l.id === parseInt(req.params.id));
-  if (!libro) return res.status(404).json({ mensaje: 'Libro no encontrado' });
-  res.status(200).json(libro);
-});
-
-// POST
-app.post('/api/libros', (req, res) => {
-  const { nombre, autor } = req.body;
-  if (!nombre || !autor) {
-    return res.status(400).json({ mensaje: 'nombre y autor son obligatorios' });
+// GET todos los libros
+app.get('/api/libros', async (req, res) => {
+  try {
+    const resultado = await pool.query('SELECT * FROM libros ORDER BY id ASC');
+    res.status(200).json(resultado.rows);
+  } catch (error) {
+    console.error('Error al obtener libros:', error.message);
+    res.status(500).json({ mensaje: 'Internal Server Error' });
   }
-  const nuevoId = libros.length > 0 ? Math.max(...libros.map(l => l.id)) + 1 : 1;
-  const nuevo = { id: nuevoId, nombre, autor };
-  libros.push(nuevo);
-  res.status(201).json(nuevo);
 });
 
-// PUT
-app.put('/api/libros/:id', (req, res) => {
-  const libro = libros.find(l => l.id === parseInt(req.params.id));
-  if (!libro) return res.status(404).json({ mensaje: 'Libro no encontrado' });
-  const { nombre, autor } = req.body;
-  if (nombre !== undefined) libro.nombre = nombre;
-  if (autor !== undefined) libro.autor = autor;
-  res.status(200).json(libro);
+// GET libro por ID
+app.get('/api/libros/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultado = await pool.query('SELECT * FROM libros WHERE id = $1', [id]);
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Libro no encontrado' });
+    }
+    res.status(200).json(resultado.rows[0]);
+  } catch (error) {
+    console.error('Error al obtener libro:', error.message);
+    res.status(500).json({ mensaje: 'Internal Server Error' });
+  }
 });
 
-// DELETE
-app.delete('/api/libros/:id', (req, res) => {
-  const index = libros.findIndex(l => l.id === parseInt(req.params.id));
-  if (index === -1) return res.status(404).json({ mensaje: 'Libro no encontrado' });
-  libros.splice(index, 1);
-  res.status(200).json({ mensaje: 'Libro eliminado correctamente' });
+// POST crear nuevo libro
+app.post('/api/libros', async (req, res) => {
+  try {
+    const { nombre, autor, precio } = req.body;
+    if (!nombre || !autor) {
+      return res.status(400).json({ mensaje: 'nombre y autor son obligatorios' });
+    }
+    const resultado = await pool.query(
+      'INSERT INTO libros (nombre, autor, precio) VALUES ($1, $2, $3) RETURNING *',
+      [nombre, autor, precio ?? null]
+    );
+    res.status(201).json(resultado.rows[0]);
+  } catch (error) {
+    console.error('Error al crear libro:', error.message);
+    res.status(500).json({ mensaje: 'Internal Server Error' });
+  }
+});
+
+// PUT actualizar libro
+app.put('/api/libros/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, autor, precio } = req.body;
+
+    // Verificar que el libro existe
+    const existe = await pool.query('SELECT * FROM libros WHERE id = $1', [id]);
+    if (existe.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Libro no encontrado' });
+    }
+
+    const libro = existe.rows[0];
+    const resultado = await pool.query(
+      'UPDATE libros SET nombre = $1, autor = $2, precio = $3 WHERE id = $4 RETURNING *',
+      [
+        nombre !== undefined ? nombre : libro.nombre,
+        autor !== undefined ? autor : libro.autor,
+        precio !== undefined ? precio : libro.precio,
+        id,
+      ]
+    );
+    res.status(200).json(resultado.rows[0]);
+  } catch (error) {
+    console.error('Error al actualizar libro:', error.message);
+    res.status(500).json({ mensaje: 'Internal Server Error' });
+  }
+});
+
+// DELETE eliminar libro
+app.delete('/api/libros/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultado = await pool.query('DELETE FROM libros WHERE id = $1 RETURNING *', [id]);
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Libro no encontrado' });
+    }
+    res.status(200).json({ mensaje: 'Libro eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar libro:', error.message);
+    res.status(500).json({ mensaje: 'Internal Server Error' });
+  }
 });
 
 app.listen(PORT, () => {
