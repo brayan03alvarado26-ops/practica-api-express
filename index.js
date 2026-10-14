@@ -1,10 +1,13 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const pool = require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Habilita CORS para que el frontend pueda consumir la API desde otro origen
+app.use(cors());
 app.use(express.json());
 
 // Verificar conexión a PostgreSQL al iniciar
