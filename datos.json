@@ -1,0 +1,52 @@
+[
+  {
+    "nombre": "La sombra del viento",
+    "autor": "Carlos Ruiz Zafón",
+    "precio": 299.9
+  },
+  {
+    "nombre": "Pedro Páramo",
+    "autor": "Juan Rulfo",
+    "precio": 189.5
+  },
+  {
+    "nombre": "Rayuela",
+    "autor": "Julio Cortázar",
+    "precio": 249
+  },
+  {
+    "nombre": "Aura",
+    "autor": "Carlos Fuentes",
+    "precio": 175
+  },
+  {
+    "nombre": "Como agua para chocolate",
+    "autor": "Laura Esquivel",
+    "precio": 215.75
+  },
+  {
+    "nombre": "El laberinto de la soledad",
+    "autor": "Octavio Paz",
+    "precio": 230
+  },
+  {
+    "nombre": "Arráncame la vida",
+    "autor": "Ángeles Mastretta",
+    "precio": 205.4
+  },
+  {
+    "nombre": "Los detectives salvajes",
+    "autor": "Roberto Bolaño",
+    "precio": 320
+  },
+  {
+    "nombre": "La tregua",
+    "autor": "Mario Benedetti",
+    "precio": 195
+  },
+  {
+    "nombre": "Confabulario",
+    "autor": "Juan José Arreola",
+    "precio": 160.25
+  }
+]

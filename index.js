@@ -5,6 +5,7 @@ const pool = require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const upload = require('./middlewares/uploads');
 
 // Habilita CORS para que el frontend pueda consumir la API desde otro origen
 app.use(cors());
