@@ -1,0 +1,6 @@
+[
+  { "categoria": "Ventas", "valor": 1250, "periodo": "Enero" },
+  { "categoria": "Usuarios", "valor": 860, "periodo": "Febrero" },
+  { "categoria": "Conversiones", "valor": 420, "periodo": "Marzo" },
+  { "categoria": "Retención", "valor": 78, "periodo": "Abril" }
+]
