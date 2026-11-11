@@ -50,4 +50,14 @@ th, td { padding: 14px 10px; border-bottom: 1px solid rgba(162, 181, 255, .12); 
 th { color: #8f8aff; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
 td { color: #c6d0e8; }
 .value-cell { color: #fff; font-weight: 700; }
+.analytics-panel { margin-top: 42px; }
+.panel-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.panel-toolbar h2 { margin: 6px 0 0; font-size: 1.5rem; }
+.panel-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+button { border: 0; border-radius: 10px; padding: 11px 16px; background: #6c63ff; color: #fff; cursor: pointer; font: inherit; font-weight: 700; }
+button:disabled { cursor: wait; opacity: .65; }
+.danger-button { background: #9b3f5b; }
+.loading-message, .error-message { margin: 22px 0; border-radius: 12px; padding: 16px 18px; }
+.loading-message { color: #b8b3ff; background: rgba(108, 99, 255, .14); }
+.error-message { color: #ffb0bc; background: rgba(155, 63, 91, .2); border: 1px solid rgba(255, 130, 150, .25); }
 @media (max-width: 700px) { .metrics-grid { grid-template-columns: 1fr; } .status-badge { display: none; } }
